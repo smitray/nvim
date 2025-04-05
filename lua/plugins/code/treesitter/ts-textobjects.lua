@@ -104,6 +104,35 @@ return {
 					},
 				},
 			})
+
+			-- Set up repeatable movements with ; and ,
+			local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
+
+			map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move, {
+				desc = "Repeat last treesitter textobject move",
+			})
+
+			map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite, {
+				desc = "Repeat last treesitter textobject move (opposite)",
+			})
+
+			-- Make built-in f, F, t, T repeatable with ; and ,
+			map({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f, {
+				desc = "Builtin f (repeatable)",
+			})
+
+			map({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F, {
+				desc = "Builtin F (repeatable)",
+			})
+
+			map({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t, {
+				desc = "Builtin t (repeatable)",
+			})
+
+			map({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T, {
+				desc = "Builtin T (repeatable)",
+			})
+
 		end,
 	},
 }
