@@ -139,3 +139,4 @@ map("n", "J", "mzJ`z", { desc = "join lines and keep cursor position" })
 map("n", "<leader>nm", function()
   print(require("noice").api.status.mode.get())
 end, { desc = "Print Noice Mode" })
+

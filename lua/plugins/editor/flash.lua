@@ -4,14 +4,14 @@ return {
 	vscode = true,
 	---@type Flash.Config
 	opts = {
-		jump = {
-			autojump = true,
-		},
-		modes = {
-			char = {
-				enabled = false
-			}
-		}
+		-- jump = {
+		-- 	autojump = true,
+		-- },
+		-- modes = {
+		-- 	char = {
+		-- 		enabled = false
+		-- 	}
+		-- }
 	},
 	-- stylua: ignore
 	keys = {

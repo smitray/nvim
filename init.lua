@@ -9,7 +9,7 @@ end
 
 -- Set leader key early
 vim.g.mapleader = " "  -- Space as leader key
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = ","
 
 -- Load core configurations
 require("core.options")     -- General settings
