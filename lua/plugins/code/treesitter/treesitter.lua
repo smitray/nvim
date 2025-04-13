@@ -10,7 +10,7 @@ return {
 					"astro", "css", "csv", "dockerfile", "go", "html",
 					"jsdoc", "json", "lua", "markdown", "markdown_inline", "php", "prisma",
 					"python", "rasi", "regex", "scss", "svelte", "sql", "ssh_config",
-					"toml", "tsx", "typescript", "vim", "vimdoc", "vue", "yaml"
+					"toml", "tsx", "typescript", "vim", "vimdoc", "vue", "yaml", "bash"
 				},
 				ignore_install = { "javascript" }, -- TypeScript parser will handle JavaScript
 				auto_install = true,
@@ -48,6 +48,18 @@ return {
 			vim.opt.foldmethod = "expr"
 			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 			vim.opt.foldenable = false -- Default to unfolded
+
+			-- make zsh files recognized as sh for bash-ls & treesitter
+			vim.filetype.add {
+				extension = {
+					zsh = "sh",
+					sh = "sh", -- force sh-files with zsh-shebang to still get sh as filetype
+				},
+				filename = {
+					[".zshrc"] = "sh",
+					[".zshenv"] = "sh",
+				},
+			}
 		end,
 	},
 }
