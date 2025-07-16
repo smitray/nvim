@@ -1,353 +1,95 @@
 -- ~/.config/nvim/lua/plugins/ui/snacks.lua
 return {
   "folke/snacks.nvim",
-  opts = {
-    animate = {
-      enabled = true,
-      duration = 20,
-      easing = "linear",
-    },
+  priority = 1000,
+  lazy = false,
 
+  ---@type snacks.Config
+  opts = {
     picker = {
       enabled = true,
-      debounce = 10,
-      throttle = 20,
-      icons = {
-        enabled = true,
-        default = "󰈙",
-        file = "󰈙",
-        folder = "󰉋",
-        git = "󰊢",
-      },
-      win = {
-        backdrop = false,
-      },
-      previewers = {
-        builtin = {
-          extensions = {
-            ["png"] = false,
-            ["jpg"] = false,
-            ["jpeg"] = false,
-            ["gif"] = false,
-            ["webp"] = false,
-          },
-        },
-      },
       sources = {
-        keymaps = {
-          layout = "ivy_split",
-        },
         explorer = {
           auto_close = true,
           layout = { layout = { position = "right" } },
         },
       },
     },
-
     explorer = {
       enabled = true,
       tree = false,
-      auto_close = true,
-      position = "right",
-      width = 35,
-      tree = {
-        enabled = false,
-        icons = {
-          enabled = true,
-          folder_closed = "󰉋",
-          folder_open = "󰝰",
-          file = "󰈙",
-          git = {
-            staged = "󰄬",
-            unstaged = "󰄱",
-            untracked = "󰋖",
-            ignored = "󰈉",
-          },
-        },
-        indent = {
-          enabled = true,
-          size = 2,
-        },
-      },
-      actions = {
-        files = {
-          close_on_open = true,
-        },
-      },
     },
-
     bufdelete = {
       enabled = true,
-      wipeout = false,
     },
-
     notifier = {
       enabled = true,
-      timeout = 3000,
-      width = { min = 40, max = 0.4 },
-      height = { min = 1, max = 0.25 },
-      margin = { top = 0, right = 1, bottom = 0 },
-      padding = true,
-      sort = { "level", "added" },
-      level = vim.log.levels.INFO,
-      icons = {
-        error = "󰅚",
-        warn = "󰀪",
-        info = "󰋽",
-        debug = "󰃤",
-        trace = "󰻞",
-      },
-      style = "compact",
-      top_down = true,
     },
-
     terminal = {
       enabled = true,
+
+      -- Floating window configuration
+      win = {
+        style = "terminal",
+        relative = "editor",
+        position = "float",
+        size = { width = 0.8, height = 0.8 },
+        border = "rounded",
+      },
+
+      -- Buffer options
       bo = {
         filetype = "snacks_terminal",
       },
-      wo = {},
-      keys = {
-        q = "hide",
-        term_normal = { "<esc>", "<esc>", mode = "t", rhs = "<C-\\><C-n>", desc = "Double escape to normal mode" },
-      },
-    },
 
+      -- Remove all keys - handle in autocmd like your original
+      keys = {
+        q = "hide",  -- Keep this as fallback
+      },
+
+      -- Terminal behavior
+      interactive = true,  -- auto start insert mode
+    },
     scratch = {
       enabled = true,
-      name = "scratch",
-      ft = function()
-        if vim.bo.buftype ~= "" then
-          return vim.bo.filetype
-        end
-        return "markdown"
-      end,
-      icon = nil,
-      root = vim.fn.stdpath("data") .. "/scratch",
-      autowrite = true,
-      filekey = {
-        cwd = true,
-        branch = true,
-        count = true,
-      },
-      win = {
-        width = 120,
-        height = 40,
-        bo = { bufhidden = "wipe" },
-        minimal = false,
-        noautocmd = false,
-      },
-    },
-
-    rename = {
-      enabled = true,
-      notify = true,
-    },
-
-    lazygit = {
-      enabled = true,
-      configure = true,
-      win = {
-        width = 0.9,
-        height = 0.9,
-        border = "rounded",
-      },
-    },
-
-    git = {
-      enabled = true,
-      blame = {
-        enabled = true,
-      },
-      log = {
-        enabled = true,
-      },
-    },
-
-    words = {
-      enabled = true,
-      debounce = 100,
-      notify_jump = false,
-      foldopen = true,
-      jumplist = true,
-      modes = { "n", "v" },
-    },
-
-    zen = {
-      enabled = true,
-      toggles = {
-        dim = true,
-        git_signs = false,
-        mini_diff = false,
-        diagnostics = false,
-        inlay_hints = false,
-      },
-      show = {
-        statusline = false,
-        tabline = false,
-      },
-      win = {
-        width = 0.6,
-        height = 0.8,
-        options = {
-          signcolumn = "no",
-          number = false,
-          relativenumber = false,
-          cursorline = false,
-          cursorcolumn = false,
-          foldcolumn = "0",
-          list = false,
-        },
-      },
-    },
-
-    dim = {
-      enabled = true,
-      animate = {
-        enabled = true,
-        duration = 100,
-      },
-      scope = {
-        min_size = 5,
-        max_size = 20,
-        siblings = true,
-      },
-    },
-
-    statuscolumn = {
-      enabled = true,
-      left = { "mark", "sign" },
-      right = { "fold", "git" },
-      folds = {
-        open = false,
-        git_hl = true,
-      },
-      git = {
-        patterns = { "GitSigns", "MiniDiff" },
-      },
-    },
-
-    indent = {
-      enabled = true,
-      indent = {
-        enabled = true,
-        char = "│",
-        only_scope = false,
-        only_current = false,
-        hl = "SnacksIndent",
-      },
-      scope = {
-        enabled = true,
-        char = "│",
-        underline = false,
-        only_current = false,
-        hl = "SnacksIndentScope",
-      },
-      chunk = {
-        enabled = false,
-      },
-      blank = {
-        enabled = false,
-      },
-    },
-
-    quickfile = {
-      enabled = true,
-      exclude = { "gitsigns", "neo-tree" },
-    },
-
-    bigfile = {
-      enabled = true,
-      notify = true,
-      size = 1.5 * 1024 * 1024,
-      setup = function(ctx)
-        vim.cmd("syntax off")
-        vim.cmd("IlluminatePauseBuf") -- Remove if not using a plugin that provides this
-        vim.opt_local.foldmethod = "manual"
-        vim.opt_local.spell = false
-        vim.opt_local.swapfile = false
-        vim.opt_local.undofile = false
-        vim.opt_local.breakindent = false
-        vim.opt_local.colorcolumn = ""
-        vim.opt_local.statuscolumn = ""
-        vim.opt_local.signcolumn = "no"
-        vim.schedule(function()
-          vim.bo[ctx.buf].syntax = ctx.ft
-        end)
-      end,
-    },
-
-    toggle = {
-      enabled = true,
-      notify = true,
-      which_key = true,
-    },
-
-    input = {
-      enabled = true,
-      win = {
-        relative = "cursor",
-        row = 1,
-        col = 0,
-        width = 60,
-        height = 1,
-        border = "rounded",
-        title = " Input ",
-        title_pos = "center",
-        wo = {
-          winhighlight = "Normal:SnacksInputNormal,FloatBorder:SnacksInputBorder,FloatTitle:SnacksInputTitle",
-          cursorline = false,
-        },
-      },
     },
   },
 
   keys = {
-    { "<leader>ds", function()
-        local snacks = require("snacks")
-        print("Snacks loaded:", snacks ~= nil)
-        print("Picker available:", snacks.picker ~= nil)
-        print("Explorer available:", snacks.explorer ~= nil)
-      end, desc = "[d]ebug [s]nacks" },
-
+    -- File & Buffer Management (5 picker types)
     { "<leader><space>", function() require("snacks").picker.smart() end, desc = "Smart Find Files" },
-    { "<leader>:", function() require("snacks").picker.command_history() end, desc = "Command History" },
-    { "<leader>?", function() require("snacks").picker.search_history() end, desc = "Search History" },
-
     { "<leader>ff", function() require("snacks").picker.files() end, desc = "[f]ind [f]iles" },
-    { "<leader>fg", function() require("snacks").picker.git_files() end, desc = "[f]ind [g]it files" },
     { "<leader>fr", function() require("snacks").picker.recent() end, desc = "[f]ind [r]ecent files" },
-    { "<leader>fs", function() require("snacks").picker.smart() end, desc = "[f]ind [s]mart" },
-    { "<leader>fp", function() require("snacks").picker.projects() end, desc = "[f]ind [p]rojects" },
-
     { "<leader>bl", function() require("snacks").picker.buffers() end, desc = "[b]uffer [l]ist" },
     { "<leader>bd", function() require("snacks").bufdelete() end, desc = "[b]uffer [d]elete" },
     { "<leader>bD", function() require("snacks").bufdelete.other() end, desc = "[b]uffer [D]elete others" },
-    { "<leader>bw", function() require("snacks").bufdelete.wipeout() end, desc = "[b]uffer [w]ipeout" },
+    { "<leader>bda", function() require("snacks").bufdelete.all() end, desc = "[b]uffer [d]elete [a]ll" },
 
+    -- Search & Text (4 picker types)
     { "<leader>sg", function() require("snacks").picker.grep() end, desc = "[s]earch [g]rep" },
     { "<leader>sw", function() require("snacks").picker.grep_word() end, desc = "[s]earch [w]ord under cursor", mode = { "n", "x" } },
     { "<leader>sb", function() require("snacks").picker.grep_buffers() end, desc = "[s]earch [b]uffers" },
     { "<leader>sl", function() require("snacks").picker.lines() end, desc = "[s]earch [l]ines" },
-    { "<leader>sr", function() require("snacks").picker.resume() end, desc = "[s]earch [r]esume" },
 
-    -- Explorer
-    { "<leader>e", function() require("snacks").explorer() end, desc = "[e]xplorer toggle" },
-    -- Consolidated: <leader>E now always opens to the project root
-    { "<leader>E", function()
-        local utils = require("core.utils") -- Explicitly require your utils module
-        local project_root = utils.get_project_root()
-        require("snacks").explorer({ cwd = project_root, focus = true })
-      end, desc = "[E]xplorer project root" },
+    -- Project Navigation (1 picker type)
+    { "<leader>fp", function() require("snacks").picker.projects() end, desc = "[f]ind [p]rojects" },
 
-    -- Git Integration
+    -- Git Integration (6 picker types)
+    { "<leader>gf", function() require("snacks").picker.git_files() end, desc = "[g]it [f]iles" },
     { "<leader>gd", function() require("snacks").picker.git_diff() end, desc = "[g]it [d]iff" },
     { "<leader>gs", function() require("snacks").picker.git_status() end, desc = "[g]it [s]tatus" },
     { "<leader>gl", function() require("snacks").picker.git_log_file() end, desc = "[g]it [l]og file" },
-    { "<leader>gg", function() require("snacks").lazygit() end, desc = "[g]it lazy[g]it" },
-    { "<leader>gB", function() require("snacks").gitbrowse() end, desc = "[g]it [B]rowse", mode = { "n", "v" } },
+    { "<leader>gb", function() require("snacks").picker.git_branches() end, desc = "[g]it [b]ranches" },
+    { "<leader>gc", function() require("snacks").picker.git_commits() end, desc = "[g]it [c]ommits" },
 
-    -- LSP & Diagnostics
+    -- Commands & Help (4 picker types)
+    { "<leader>:", function() require("snacks").picker.command_history() end, desc = "Command History" },
+    { "<leader>?", function() require("snacks").picker.search_history() end, desc = "Search History" },
+    { "<leader>uc", function() require("snacks").picker.commands() end, desc = "[u]tility [c]ommands" },
+    { "<leader>uk", function() require("snacks").picker.keymaps() end, desc = "[u]tility [k]eymaps" },
+    { "<leader>uh", function() require("snacks").picker.help() end, desc = "[u]tility [h]elp" },
+
+    -- LSP Integration (7 picker types)
     { "gd", function() require("snacks").picker.lsp_definitions() end, desc = "Goto Definition" },
     { "gD", function() require("snacks").picker.lsp_declarations() end, desc = "Goto Declaration" },
     { "gr", function() require("snacks").picker.lsp_references() end, nowait = true, desc = "References" },
@@ -358,67 +100,120 @@ return {
     { "<leader>ls", function() require("snacks").picker.lsp_symbols() end, desc = "[l]sp [s]ymbols" },
     { "<leader>lS", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "[l]sp [S]ymbols workspace" },
 
-    -- Terminal
-    { "<leader>tt", function() require("snacks").terminal() end, desc = "[t]erminal [t]oggle float" },
-    { "<leader>ts", function() require("snacks").terminal.toggle("split") end, desc = "[t]erminal [s]plit bottom" },
-    { "<c-/>", function() require("snacks").terminal() end, desc = "Toggle Terminal" },
-    { "<c-_>", function() require("snacks").terminal() end, desc = "which_key_ignore" },
-
-    -- Commands
-    { "<leader>uc", function() require("snacks").picker.commands() end, desc = "[u]tility [c]ommands" },
-    { "<leader>uk", function() require("snacks").picker.keymaps() end, desc = "[u]tility [k]eymaps" },
-    { "<leader>uh", function() require("snacks").picker.help() end, desc = "[u]tility [h]elp" },
-
-    -- Utilities
+    -- Utilities (8 picker types)
     { "<leader>ur", function() require("snacks").picker.registers() end, desc = "[u]tility [r]egisters" },
-    { "<leader>un", function() require("snacks").picker.notifications() end, desc = "[u]tility [n]otifications" },
     { "<leader>uu", function() require("snacks").picker.undo() end, desc = "[u]tility [u]ndo" },
+    { "<leader>sr", function() require("snacks").picker.resume() end, desc = "[s]earch [r]esume" },
+    { "<leader>un", function() require("snacks").picker.notifications() end, desc = "[u]tility [n]otifications" },
+    { "<leader>uj", function() require("snacks").picker.jumps() end, desc = "[u]tility [j]umps" },
+    { "<leader>uH", function() require("snacks").picker.highlights() end, desc = "[u]tility [H]ighlights" },
+    { "<leader>ua", function() require("snacks").picker.autocmds() end, desc = "[u]tility [a]utocmds" },
+    { "z=", function() require("snacks").picker.spelling() end, desc = "Spelling suggestions" },
 
-    -- Notes
-    { "<leader>ns", function() require("snacks").scratch() end, desc = "[n]otes [s]cratch" },
-    { "<leader>nS", function() require("snacks").scratch.select() end, desc = "[n]otes [S]cratch select" },
-
-    -- Word Navigation
-    { "]]", function() require("snacks").words.jump(vim.v.count1) end, desc = "Next Reference", mode = { "n", "t" } },
-    { "[[", function() require("snacks").words.jump(-vim.v.count1) end, desc = "Prev Reference", mode = { "n", "t" } },
-
-    -- Zen Mode
-    { "<leader>z", function() require("snacks").zen() end, desc = "[z]en mode" },
-    { "<leader>Z", function() require("snacks").zen.zoom() end, desc = "[Z]en zoom" },
-
-    -- Rename
-    { "<leader>rn", function() require("snacks").rename.rename_file() end, desc = "[r]e[n]ame file" },
-
-    -- Notification management
+    -- Notifications
     { "<leader>nd", function() require("snacks").notifier.hide() end, desc = "[n]otification [d]ismiss" },
     { "<leader>nh", function() require("snacks").notifier.show_history() end, desc = "[n]otification [h]istory" },
+
+    -- Terminal (toggle with double ESC to close)
+    { "<leader>tt", function() require("snacks").terminal.toggle() end, desc = "[t]erminal [t]oggle" },
+
+    -- Scratch Notes (project-scoped journal with ESC to save & close)
+    { "<leader>ns", function()
+        -- Use existing utils function
+        local utils = require("core.utils")
+        local project_root = utils.get_project_root()
+        local journal_path = project_root .. "/journal.md"
+        vim.notify("Journal path: " .. journal_path, vim.log.levels.INFO)
+
+
+        -- Debug: Print the paths to see what's happening
+        print("Project root:", project_root)
+        print("Journal path:", journal_path)
+
+        -- Check if buffer already exists for this file
+        local buf = vim.fn.bufnr(journal_path)
+
+        if buf == -1 then
+          -- Buffer doesn't exist, create it
+          buf = vim.fn.bufadd(journal_path)
+          vim.fn.bufload(buf)
+        end
+
+        -- Create floating window with the buffer
+        local width = 120
+        local height = 40
+        local win_width = vim.o.columns
+        local win_height = vim.o.lines
+        local row = math.ceil((win_height - height) / 2)
+        local col = math.ceil((win_width - width) / 2)
+
+        local win = vim.api.nvim_open_win(buf, true, {
+          relative = "editor",
+          width = width,
+          height = height,
+          row = row,
+          col = col,
+          style = "minimal",
+          border = "rounded",
+          title = " Project Journal ",
+          title_pos = "center",
+        })
+
+        -- Set up the buffer
+        vim.bo[buf].filetype = "markdown"
+        vim.opt_local.spell = true
+        vim.opt_local.spelllang = "en_us"
+      end, desc = "[n]otes [s]cratch journal" },
+
+    -- Explorer
+    { "<leader>e", function() require("snacks").explorer() end, desc = "[e]xplorer toggle" },
+    { "<leader>E", function()
+        local utils = require("core.utils")
+        local project_root = utils.get_project_root()
+        require("snacks").explorer({ cwd = project_root })
+      end, desc = "[E]xplorer project root" },
   },
 
-  config = function()
-    local snacks = require("snacks")
+  init = function()
 
-    snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>ts")
-    snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>tw")
-    snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>tL")
-    snacks.toggle.diagnostics():map("<leader>td")
-    snacks.toggle.line_number():map("<leader>tl")
-    snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map("<leader>tc")
-    snacks.toggle.treesitter():map("<leader>tT")
-    snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>tb")
-    snacks.toggle.inlay_hints():map("<leader>th")
-    snacks.toggle.indent():map("<leader>ti")
-    snacks.toggle.dim():map("<leader>tD")
-    snacks.toggle.words():map("<leader>tW")
+  -- Terminal ESC handling with autocmd (your original working method)
+    vim.api.nvim_create_autocmd("TermOpen", {
+      pattern = "*",
+      callback = function(ev)
+        local buf = ev.buf
+        -- Check if it's a snacks terminal
+        if vim.bo[buf].filetype == "snacks_terminal" then
+          -- Double ESC: works with zsh vi-mode (first ESC goes to zsh, second to nvim)
+          vim.keymap.set("t", "<esc><esc>", function()
+            vim.cmd("close")
+          end, { buffer = buf, desc = "Close terminal (double ESC)" })
 
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      callback = function()
-        vim.api.nvim_set_hl(0, "SnacksIndent", { fg = "#45475a" })
-        vim.api.nvim_set_hl(0, "SnacksIndentScope", { fg = "#89b4fa", bold = true })
-        vim.api.nvim_set_hl(0, "SnacksInputNormal", { link = "NormalFloat" })
-        vim.api.nvim_set_hl(0, "SnacksInputBorder", { link = "FloatBorder" })
-        vim.api.nvim_set_hl(0, "SnacksInputTitle", { link = "Title" })
+          -- Alternative: Ctrl+q for instant close
+          vim.keymap.set("t", "<c-q>", function()
+            vim.cmd("close")
+          end, { buffer = buf, desc = "Close terminal (Ctrl+q)" })
+        end
       end,
     })
-    vim.cmd("doautocmd ColorScheme")
+    -- Custom autocmds for project journal
+    vim.api.nvim_create_autocmd("BufEnter", {
+      pattern = "*journal.md",
+      callback = function(ev)
+        -- ESC to save and close journal (smart close)
+        vim.keymap.set("n", "<esc>", function()
+          -- Save if modified
+          if vim.bo[ev.buf].modified then
+            vim.cmd("write")
+          end
+
+          -- Close the window
+          vim.cmd("close")
+        end, { buffer = ev.buf, desc = "Save and close journal" })
+
+        -- Enable spellcheck for better writing
+        vim.opt_local.spell = true
+        vim.opt_local.spelllang = "en_us"
+      end,
+    })
   end,
 }

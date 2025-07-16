@@ -76,17 +76,28 @@ function M.get_project_root()
     "composer.json",
   }
 
+  -- Start from current buffer's directory, fallback to cwd
   local current_dir = vim.fn.expand("%:p:h")
+  if current_dir == "" or current_dir == "." then
+    current_dir = vim.fn.getcwd()
+  end
 
+  -- Search upward for project root markers
   for _, file in ipairs(root_files) do
     local found = vim.fn.findfile(file, current_dir .. ";")
     if found ~= "" then
-      return vim.fn.fnamemodify(found, ":h")
+      return vim.fn.fnamemodify(found, ":p:h")
+    end
+    local found_dir = vim.fn.finddir(file, current_dir .. ";")
+    if found_dir ~= "" then
+      return vim.fn.fnamemodify(found_dir, ":p:h:h")
     end
   end
 
-  return current_dir
+  -- Fallback: return absolute path of current working directory
+  return vim.fn.fnamemodify(current_dir, ":p")
 end
+
 
 -- Create a centered floating window
 function M.create_float_win(width_ratio, height_ratio, opts)
