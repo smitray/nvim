@@ -155,69 +155,77 @@ return {
     { "<leader>gB", function() require("snacks").git.blame_line() end, desc = "[g]it [B]lame line" },
     { "<leader>gg", function() require("snacks").lazygit() end, desc = "[g]it laz[g]it" },
 
-    -- Git Workflow (using your aliases)
-    { "<leader>gaa", function() require("snacks").terminal("gaa && echo 'All changes added' && echo 'Press enter...'; read") end, desc = "[g]it [a]dd [a]ll" },
-    { "<leader>gp", function() require("snacks").terminal("gp && echo 'Push completed' && echo 'Press enter...'; read") end, desc = "[g]it [p]ush" },
-    { "<leader>gup", function() require("snacks").terminal("gup && echo 'Pull rebase completed' && echo 'Press enter...'; read") end, desc = "[g]it p[u]ll rebase" },
-    { "<leader>gst", function() require("snacks").terminal("gst && echo 'Press enter...'; read") end, desc = "[g]it [st]atus terminal" },
+    -- Git Workflow (using raw git commands)
+    -- Essential Git Operations
+    { "<leader>gaa", function() require("snacks").terminal("git add . && echo 'All changes added' && echo 'Press enter...'; read") end, desc = "[g]it [a]dd [a]ll" },
+    { "<leader>gp", function() require("snacks").terminal("git push && echo 'Push completed' && echo 'Press enter...'; read") end, desc = "[g]it [p]ush" },
+    { "<leader>gst", function() require("snacks").terminal("git status && echo 'Press enter...'; read") end, desc = "[g]it [st]atus terminal" },
 
     -- Complete Git Workflows
     { "<leader>gap", function()
         vim.ui.input({ prompt = "Commit message: " }, function(commit_msg)
           if commit_msg and commit_msg ~= "" then
-            require("snacks").terminal("gaa && gcmsg '" .. commit_msg .. "' && gp && echo 'Add, commit, and push completed' && echo 'Press enter...'; read")
+            require("snacks").terminal("git add . && git commit -m '" .. commit_msg .. "' && git push && echo 'Add, commit, and push completed' && echo 'Press enter...'; read")
           else
             vim.notify("Commit message is required", vim.log.levels.WARN)
           end
         end)
       end, desc = "[g]it [a]dd commit [p]ush" },
 
-    { "<leader>gac", function() require("snacks").terminal("gaa && gc") end, desc = "[g]it [a]dd [c]ommit (interactive)" },
-    { "<leader>gacp", function() require("snacks").terminal("gaa && gc && gp") end, desc = "[g]it [a]dd [c]ommit [p]ush (interactive)" },
+    { "<leader>gac", function()
+        vim.ui.input({ prompt = "Commit message: " }, function(commit_msg)
+          if commit_msg and commit_msg ~= "" then
+            require("snacks").terminal("git add . && git commit -m '" .. commit_msg .. "' && echo 'Add and commit completed' && echo 'Press enter...'; read")
+          else
+            vim.notify("Commit message is required", vim.log.levels.WARN)
+          end
+        end)
+      end, desc = "[g]it [a]dd [c]ommit (no push)" },
+
+    { "<leader>gaci", function() require("snacks").terminal("git add . && git commit") end, desc = "[g]it [a]dd [c]ommit [i]nteractive" },
+    { "<leader>gacpi", function() require("snacks").terminal("git add . && git commit && git push") end, desc = "[g]it [a]dd [c]ommit [p]ush [i]nteractive" },
+
+    -- Rebase Operations
+    { "<leader>gup", function() require("snacks").terminal("git pull --rebase && echo 'Pull rebase completed' && echo 'Press enter...'; read") end, desc = "[g]it p[u]ll rebase" },
+    { "<leader>gri", function()
+        vim.ui.input({ prompt = "Number of commits to rebase (default: 3): " }, function(num_commits)
+          local commits = num_commits and num_commits ~= "" and num_commits or "3"
+          require("snacks").terminal("git rebase -i HEAD~" .. commits)
+        end)
+      end, desc = "[g]it [r]ebase [i]nteractive" },
+
+    { "<leader>grc", function() require("snacks").terminal("git rebase --continue && echo 'Rebase continue completed' && echo 'Press enter...'; read") end, desc = "[g]it [r]ebase [c]ontinue" },
+    { "<leader>gra", function() require("snacks").terminal("git rebase --abort && echo 'Rebase aborted' && echo 'Press enter...'; read") end, desc = "[g]it [r]ebase [a]bort" },
 
     -- Branch Operations
-    { "<leader>gcm", function() require("snacks").terminal("gcm && echo 'Switched to main branch' && echo 'Press enter...'; read") end, desc = "[g]it checkout [m]ain" },
-    { "<leader>gcd", function() require("snacks").terminal("gcd && echo 'Switched to develop branch' && echo 'Press enter...'; read") end, desc = "[g]it checkout [d]evelop" },
+    { "<leader>gcm", function() require("snacks").terminal("git checkout main && echo 'Switched to main branch' && echo 'Press enter...'; read") end, desc = "[g]it checkout [m]ain" },
+    { "<leader>gcd", function() require("snacks").terminal("git checkout develop && echo 'Switched to develop branch' && echo 'Press enter...'; read") end, desc = "[g]it checkout [d]evelop" },
     { "<leader>gcb", function()
         vim.ui.input({ prompt = "New branch name: " }, function(branch_name)
           if branch_name and branch_name ~= "" then
-            require("snacks").terminal("gcb " .. branch_name .. " && echo 'Created and switched to branch: " .. branch_name .. "' && echo 'Press enter...'; read")
+            require("snacks").terminal("git checkout -b " .. branch_name .. " && echo 'Created and switched to branch: " .. branch_name .. "' && echo 'Press enter...'; read")
           else
             vim.notify("Branch name is required", vim.log.levels.WARN)
           end
         end)
       end, desc = "[g]it [c]reate [b]ranch" },
 
-    -- GitHub CLI Integration
-    { "<leader>gpr", function() require("snacks").terminal("gh pr list && echo 'Press enter...'; read") end, desc = "[g]it [pr] list" },
-    { "<leader>gprc", function() require("snacks").terminal("gh pr create") end, desc = "[g]it [pr] [c]reate" },
-    { "<leader>gprm", function() require("snacks").terminal("gh pr ready && gh pr merge") end, desc = "[g]it [pr] [m]erge" },
-    { "<leader>gpro", function() require("snacks").terminal("gh pr checkout") end, desc = "[g]it [pr] check[o]ut" },
-    { "<leader>gprv", function() require("snacks").terminal("gh pr view && echo 'Press enter...'; read") end, desc = "[g]it [pr] [v]iew" },
-
-    -- GitHub Issues
-    { "<leader>gi", function() require("snacks").terminal("gh issue list && echo 'Press enter...'; read") end, desc = "[g]it [i]ssue list" },
-    { "<leader>gic", function() require("snacks").terminal("gh issue create") end, desc = "[g]it [i]ssue [c]reate" },
-    { "<leader>giv", function() require("snacks").terminal("gh issue view") end, desc = "[g]it [i]ssue [v]iew" },
-    { "<leader>gix", function()
-        vim.ui.input({ prompt = "Issue Number: " }, function(issue_number)
-          if issue_number and issue_number ~= "" then
-            require("snacks").terminal("gh issue close " .. issue_number)
+    -- Advanced Rebase Workflows
+    { "<leader>grp", function()
+        vim.ui.input({ prompt = "Commit message for rebase: " }, function(commit_msg)
+          if commit_msg and commit_msg ~= "" then
+            require("snacks").terminal("git add . && git rebase --continue && git commit --amend -m '" .. commit_msg .. "' && echo 'Rebase with new commit message completed' && echo 'Press enter...'; read")
           else
-            vim.notify("Issue number is required", vim.log.levels.WARN)
+            vim.notify("Commit message is required", vim.log.levels.WARN)
           end
         end)
-      end, desc = "[g]it [i]ssue close ([x])" },
+      end, desc = "[g]it [r]ebase continue with new commit message ([p])" },
 
-    -- GitHub Repository Operations
-    { "<leader>grv", function() require("snacks").terminal("gh repo view && echo 'Press enter...'; read") end, desc = "[g]it [r]epo [v]iew" },
-    { "<leader>grw", function() require("snacks").terminal("gh repo view --web") end, desc = "[g]it [r]epo [w]eb" },
-    { "<leader>grc", function() require("snacks").terminal("gh repo clone") end, desc = "[g]it [r]epo [c]lone" },
+    { "<leader>gsync", function() require("snacks").terminal("git pull --rebase && git push && echo 'Sync completed (pull rebase + push)' && echo 'Press enter...'; read") end, desc = "[g]it [sync] (pull rebase + push)" },
 
-    -- Advanced Workflows
-    { "<leader>gsync", function() require("snacks").terminal("gup && gp && echo 'Sync completed (pull rebase + push)' && echo 'Press enter...'; read") end, desc = "[g]it [sync] (pull rebase + push)" },
-    { "<leader>gwip", function() require("snacks").terminal("gwip && echo 'WIP commit created' && echo 'Press enter...'; read") end, desc = "[g]it [wip] commit" },
-    { "<leader>gunwip", function() require("snacks").terminal("gunwip && echo 'WIP commit undone' && echo 'Press enter...'; read") end, desc = "[g]it [unwip]" },
+    -- Quick WIP operations
+    { "<leader>gwip", function() require("snacks").terminal("git add . && git commit -m 'WIP: work in progress' && echo 'WIP commit created' && echo 'Press enter...'; read") end, desc = "[g]it [wip] commit" },
+    { "<leader>gunwip", function() require("snacks").terminal("git reset HEAD~1 && echo 'Last commit undone (soft reset)' && echo 'Press enter...'; read") end, desc = "[g]it [unwip] (undo last commit)" },
 
     -- LSP Integration
     { "gd", function() require("snacks").picker.lsp_definitions() end, desc = "Goto Definition" },
