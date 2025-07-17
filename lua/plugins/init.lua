@@ -10,8 +10,8 @@ return {
 
 --  { import = "plugins.lsp" },
 
---  { import = "plugins.editor" },
+  { import = "plugins.editor" },
 
---  { import = "plugins.code" },
+  { import = "plugins.code" },
 
 }
