@@ -227,17 +227,6 @@ return {
     { "<leader>gwip", function() require("snacks").terminal("git add . && git commit -m 'WIP: work in progress' && echo 'WIP commit created' && echo 'Press enter...'; read") end, desc = "[g]it [wip] commit" },
     { "<leader>gunwip", function() require("snacks").terminal("git reset HEAD~1 && echo 'Last commit undone (soft reset)' && echo 'Press enter...'; read") end, desc = "[g]it [unwip] (undo last commit)" },
 
-    -- LSP Integration
-    { "gd", function() require("snacks").picker.lsp_definitions() end, desc = "Goto Definition" },
-    { "gD", function() require("snacks").picker.lsp_declarations() end, desc = "Goto Declaration" },
-    { "gr", function() require("snacks").picker.lsp_references() end, nowait = true, desc = "References" },
-    { "gI", function() require("snacks").picker.lsp_implementations() end, desc = "Goto Implementation" },
-    { "gy", function() require("snacks").picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
-    { "<leader>ld", function() require("snacks").picker.diagnostics() end, desc = "[l]sp [d]iagnostics" },
-    { "<leader>lD", function() require("snacks").picker.diagnostics_buffer() end, desc = "[l]sp [D]iagnostics buffer" },
-    { "<leader>ls", function() require("snacks").picker.lsp_symbols() end, desc = "[l]sp [s]ymbols" },
-    { "<leader>lS", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "[l]sp [S]ymbols workspace" },
-
     -- Reference Navigation with Word Jumps
     { "]]", function()
         require("snacks").words.jump(vim.v.count1)
