@@ -1,10 +1,9 @@
--- lua/plugins/lsp/opts.lua
--- Shared LSP capabilities and keymaps
--- THIS IS A UTILITY MODULE, NOT A PLUGIN SPEC
+-- lua/core/lsp-opts.lua
+-- Enhanced LSP capabilities and keymaps with blink.cmp integration
 
 local M = {}
 
--- Enhanced on_attach function with snacks integration
+-- Enhanced on_attach function with better error handling
 M.on_attach = function(client, bufnr)
   local map = function(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, {
@@ -15,7 +14,7 @@ M.on_attach = function(client, bufnr)
     })
   end
 
-  -- LSP navigation using snacks.picker (clean, no fallbacks)
+  -- LSP navigation using snacks.picker
   map("n", "gd", function()
     require("snacks").picker.lsp_definitions()
   end, "[g]oto [d]efinition")
@@ -33,18 +32,16 @@ M.on_attach = function(client, bufnr)
   end, "[g]oto [r]eferences")
 
   -- Hover and signature help
-  map("n", "K", vim.lsp.buf.hover, "[K] hover documentation")
-  map("n", "<C-k>", vim.lsp.buf.signature_help, "signature [k]ey help")
-  map("i", "<C-k>", vim.lsp.buf.signature_help, "signature [k]ey help")
+  map("n", "K", vim.lsp.buf.hover, "hover documentation")
+  map("n", "<C-k>", vim.lsp.buf.signature_help, "signature help")
+  map("i", "<C-k>", vim.lsp.buf.signature_help, "signature help")
 
   -- Code actions and refactoring
   map("n", "<leader>ca", vim.lsp.buf.code_action, "[c]ode [a]ction")
   map("x", "<leader>ca", vim.lsp.buf.code_action, "[c]ode [a]ction")
   map("n", "<leader>cr", vim.lsp.buf.rename, "[c]ode [r]ename")
 
-  -- Note: <leader>cf formatting is handled by conform.nvim plugin
-
-  -- Diagnostics with snacks integration
+  -- Diagnostics with better navigation
   map("n", "<leader>cd", function()
     vim.diagnostic.open_float({
       border = "rounded",
@@ -59,15 +56,13 @@ M.on_attach = function(client, bufnr)
 
   map("n", "[d", function()
     vim.diagnostic.goto_prev({ float = false })
-    vim.cmd("normal! zz") -- Center the screen
-  end, "[d]iagnostic previous")
+    vim.cmd("normal! zz") -- Center screen
+  end, "diagnostic previous")
 
   map("n", "]d", function()
     vim.diagnostic.goto_next({ float = false })
-    vim.cmd("normal! zz") -- Center the screen
-  end, "[d]iagnostic next")
-
-  map("n", "<leader>cq", vim.diagnostic.setloclist, "[c]ode diagnostic [q]uickfix")
+    vim.cmd("normal! zz") -- Center screen
+  end, "diagnostic next")
 
   -- Workspace management
   map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "[w]orkspace [a]dd folder")
@@ -81,23 +76,7 @@ M.on_attach = function(client, bufnr)
     end
   end, "[w]orkspace [l]ist folders")
 
-  -- Client info
-  map("n", "<leader>cl", function()
-    local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
-    if #clients == 0 then
-      vim.notify("No LSP clients active", vim.log.levels.WARN)
-      return
-    end
-
-    local client_info = {}
-    for _, client in ipairs(clients) do
-      table.insert(client_info, string.format("• %s (id: %d)", client.name, client.id))
-    end
-
-    vim.notify("Active LSP clients:\n" .. table.concat(client_info, "\n"), vim.log.levels.INFO)
-  end, "[c]ode [l]sp clients")
-
-  -- Toggle inlay hints (if supported)
+  -- Toggle inlay hints if supported
   if client.supports_method("textDocument/inlayHint") then
     map("n", "<leader>ch", function()
       local current_setting = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
@@ -115,7 +94,7 @@ M.on_attach = function(client, bufnr)
     require("snacks").picker.lsp_workspace_symbols()
   end, "[c]ode [S]ymbols workspace")
 
-  -- Auto-commands for LSP
+  -- Auto-commands for LSP enhancements
   local group = vim.api.nvim_create_augroup("LspAttach_" .. bufnr, { clear = true })
 
   -- Highlight symbol under cursor
@@ -132,12 +111,12 @@ M.on_attach = function(client, bufnr)
     })
   end
 
-  -- Show diagnostic on hover (if no floating window is open)
+  -- Auto-show diagnostic on cursor hold (if no floating window is open)
   vim.api.nvim_create_autocmd("CursorHold", {
     buffer = bufnr,
     group = group,
     callback = function()
-      -- Only show diagnostic if no floating window is currently open
+      -- Only show if no floating window is currently open
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         local config = vim.api.nvim_win_get_config(win)
         if config.relative ~= "" then
@@ -156,28 +135,26 @@ M.on_attach = function(client, bufnr)
     end,
   })
 
-  -- Notify when LSP client attaches
+  -- Notify when client attaches
   vim.notify(
-    string.format("LSP client '%s' attached to buffer %d", client.name, bufnr),
+    string.format("LSP '%s' attached to buffer %d", client.name, bufnr),
     vim.log.levels.INFO,
     { title = "LSP" }
   )
 end
 
 -- Enhanced capabilities with blink.cmp integration
-M.capabilities = vim.tbl_deep_extend(
-  "force",
-  vim.lsp.protocol.make_client_capabilities(),
-  -- Add blink.cmp capabilities if available, with fallback
-  (function()
-    local ok, blink = pcall(require, "blink.cmp")
-    if ok and blink.get_lsp_capabilities then
-      return blink.get_lsp_capabilities()
-    else
-      return {}
-    end
-  end)(),
-  {
+M.capabilities = function()
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+  -- Add blink.cmp capabilities if available
+  local ok, blink = pcall(require, "blink.cmp")
+  if ok and blink.get_lsp_capabilities then
+    capabilities = vim.tbl_deep_extend("force", capabilities, blink.get_lsp_capabilities())
+  end
+
+  -- Enhanced capabilities for better LSP experience
+  capabilities = vim.tbl_deep_extend("force", capabilities, {
     textDocument = {
       completion = {
         completionItem = {
@@ -204,9 +181,7 @@ M.capabilities = vim.tbl_deep_extend(
       publishDiagnostics = {
         relatedInformation = true,
         versionSupport = false,
-        tagSupport = {
-          valueSet = { 1, 2 },
-        },
+        tagSupport = { valueSet = { 1, 2 } },
         codeDescriptionSupport = true,
         dataSupport = true,
       },
@@ -217,7 +192,9 @@ M.capabilities = vim.tbl_deep_extend(
         dynamicRegistration = true,
       },
     },
-  }
-)
+  })
+
+  return capabilities
+end
 
 return M

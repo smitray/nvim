@@ -1,7 +1,14 @@
 -- lua/plugins/lsp/lspsaga.lua
+-- Enhanced LSP UI with refactoring capabilities
+
 return {
   "nvimdev/lspsaga.nvim",
   event = "LspAttach",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter",
+    "echasnovski/mini.icons",
+  },
+
   config = function()
     local icons = require("core.icons")
 
@@ -9,16 +16,16 @@ return {
       ui = {
         border = "rounded",
         winblend = 0,
-        expand = "",
-        collapse = "",
-        code_action = "💡",
-        incoming = " ",
-        outgoing = " ",
-        hover = " ",
+        expand = icons.ui.ArrowOpen,
+        collapse = icons.ui.ArrowClosed,
+        code_action = icons.ui.Ligthbulb,
+        incoming = icons.ui.Incoming,
+        outgoing = icons.ui.Outgoing,
+        hover = icons.ui.Comment,
         kind = icons.kind,
       },
 
-      -- Hover configuration
+      -- Enhanced hover
       hover = {
         max_width = 0.6,
         max_height = 0.8,
@@ -33,20 +40,17 @@ return {
         jump_num_shortcut = true,
         max_width = 0.7,
         max_height = 0.6,
-        max_show_width = 0.9,
-        max_show_height = 0.6,
         text_hl_follow = true,
         border_follow = true,
-        wrap_long_lines = true,
         keys = {
           exec_action = "o",
           quit = "q",
-          toggle_or_jump = "<CR>",
+          expand_or_jump = "<CR>",
           quit_in_show = { "q", "<ESC>" },
         },
       },
 
-      -- Code action configuration
+      -- Enhanced code action with refactoring
       code_action = {
         num_shortcut = true,
         show_server_name = false,
@@ -57,7 +61,7 @@ return {
         },
       },
 
-      -- Lightbulb configuration
+      -- Lightbulb for code actions
       lightbulb = {
         enable = true,
         enable_in_insert = false,
@@ -66,43 +70,24 @@ return {
         virtual_text = true,
       },
 
-      -- Finder configuration
+      -- Enhanced finder
       finder = {
         max_height = 0.5,
         left_width = 0.4,
         right_width = 0.6,
-        methods = {},
         default = "ref+imp",
         layout = "float",
-        silent = false,
-        filter = {},
-        fname_sub = nil,
-        sp_inexist = false,
-        sp_global = false,
-        ly_botright = false,
         keys = {
           jump_to = "p",
           expand_or_jump = "o",
           vsplit = "s",
           split = "i",
           tabe = "t",
-          tabnew = "r",
           quit = { "q", "<ESC>" },
-          close_in_preview = "<ESC>",
         },
       },
 
-      -- Definition configuration
-      definition = {
-        edit = "<C-c>o",
-        vsplit = "<C-c>v",
-        split = "<C-c>i",
-        tabe = "<C-c>t",
-        quit = "q",
-        close = "<Esc>",
-      },
-
-      -- Rename configuration
+      -- Enhanced rename with project-wide support
       rename = {
         quit = "<C-c>",
         exec = "<CR>",
@@ -121,22 +106,19 @@ return {
       -- Outline configuration
       outline = {
         win_position = "right",
-        win_with = "",
         win_width = 30,
         preview_width = 0.4,
         show_detail = true,
         auto_preview = true,
         auto_refresh = true,
         auto_close = true,
-        auto_resize = false,
-        custom_sort = nil,
         keys = {
           expand_or_jump = "o",
           quit = "q",
         },
       },
 
-      -- Callhierarchy configuration
+      -- Call hierarchy for refactoring
       callhierarchy = {
         show_detail = false,
         keys = {
@@ -157,64 +139,64 @@ return {
         hide_keyword = true,
         show_file = true,
         folder_level = 2,
-        respect_root = false,
         color_mode = true,
       },
 
-      -- Beacon for jump
+      -- Beacon for jump visualization
       beacon = {
         enable = true,
         frequency = 7,
       },
 
-      -- Request timeout
       request_timeout = 2000,
     })
   end,
 
-  -- Enhanced keymaps with your [x]word [y]word format
-  init = function()
-    local map = vim.keymap.set
-    local opts = { silent = true, noremap = true }
+  -- Enhanced keymaps for refactoring and navigation
+  keys = {
+    -- Enhanced LSP navigation with Saga UI
+    { "gh", "<cmd>Lspsaga finder<CR>", desc = "[g]o [h]ere (LSP finder)" },
+    { "gp", "<cmd>Lspsaga peek_definition<CR>", desc = "[g]o [p]eek definition" },
+    { "gP", "<cmd>Lspsaga peek_type_definition<CR>", desc = "[g]o [P]eek type definition" },
 
-    -- LSP Saga specific navigation (enhanced UI)
-    map("n", "gh", "<cmd>Lspsaga finder<CR>", vim.tbl_extend("force", opts, { desc = "[g]o [h]ere (LSP finder)" }))
-    map("n", "gp", "<cmd>Lspsaga peek_definition<CR>", vim.tbl_extend("force", opts, { desc = "[g]o [p]eek definition" }))
-    map("n", "gP", "<cmd>Lspsaga peek_type_definition<CR>", vim.tbl_extend("force", opts, { desc = "[g]o [P]eek type definition" }))
+    -- Enhanced diagnostics
+    { "gl", "<cmd>Lspsaga show_line_diagnostics<CR>", desc = "[g]o [l]ine diagnostics" },
+    { "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", desc = "diagnostic pr[e]vious" },
+    { "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", desc = "diagnostic n[e]xt" },
+    {
+      "[E",
+      function()
+        require("lspsaga.diagnostic"):goto_prev({ severity = vim.diagnostic.severity.ERROR })
+      end,
+      desc = "error pr[E]vious",
+    },
+    {
+      "]E",
+      function()
+        require("lspsaga.diagnostic"):goto_next({ severity = vim.diagnostic.severity.ERROR })
+      end,
+      desc = "error n[E]xt",
+    },
 
-    -- Diagnostics with enhanced UI
-    map("n", "gl", "<cmd>Lspsaga show_line_diagnostics<CR>", vim.tbl_extend("force", opts, { desc = "[g]o [l]ine diagnostics" }))
-    map("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", vim.tbl_extend("force", opts, { desc = "diagnostic pr[e]vious" }))
-    map("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", vim.tbl_extend("force", opts, { desc = "diagnostic n[e]xt" }))
+    -- Enhanced code actions with refactoring
+    { "<leader>ca", "<cmd>Lspsaga code_action<CR>", desc = "[c]ode [a]ction", mode = { "n", "v" } },
 
-    -- Enhanced code actions
-    map("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [a]ction (saga)" }))
-    map("v", "<leader>ca", "<cmd>Lspsaga code_action<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [a]ction (saga)" }))
-
-    -- Enhanced rename
-    map("n", "<leader>cr", "<cmd>Lspsaga rename<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [r]ename (saga)" }))
-    map("n", "<leader>cR", "<cmd>Lspsaga rename ++project<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [R]ename project-wide" }))
+    -- Enhanced rename operations
+    { "<leader>cr", "<cmd>Lspsaga rename<CR>", desc = "[c]ode [r]ename" },
+    { "<leader>cR", "<cmd>Lspsaga rename ++project<CR>", desc = "[c]ode [R]ename project-wide" },
 
     -- Outline and navigation
-    map("n", "<leader>co", "<cmd>Lspsaga outline<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [o]utline" }))
+    { "<leader>co", "<cmd>Lspsaga outline<CR>", desc = "[c]ode [o]utline" },
 
-    -- Call hierarchy
-    map("n", "<leader>ci", "<cmd>Lspsaga incoming_calls<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [i]ncoming calls" }))
-    map("n", "<leader>cO", "<cmd>Lspsaga outgoing_calls<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [O]utgoing calls" }))
+    -- Call hierarchy for refactoring
+    { "<leader>ci", "<cmd>Lspsaga incoming_calls<CR>", desc = "[c]ode [i]ncoming calls" },
+    { "<leader>cO", "<cmd>Lspsaga outgoing_calls<CR>", desc = "[c]ode [O]utgoing calls" },
 
-    -- Hover with enhanced UI (overrides default K)
-    map("n", "<leader>K", "<cmd>Lspsaga hover_doc<CR>", vim.tbl_extend("force", opts, { desc = "hover [K]nowledge (saga)" }))
-    map("n", "<leader>ck", "<cmd>Lspsaga hover_doc ++keep<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode hover [k]eep" }))
+    -- Enhanced hover
+    { "<leader>K", "<cmd>Lspsaga hover_doc<CR>", desc = "hover documentation (saga)" },
+    { "<leader>ck", "<cmd>Lspsaga hover_doc ++keep<CR>", desc = "[c]ode hover [k]eep" },
 
     -- Terminal integration
-    map("n", "<leader>ct", "<cmd>Lspsaga term_toggle<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [t]erminal toggle" }))
-    map("t", "<leader>ct", "<cmd>Lspsaga term_toggle<CR>", vim.tbl_extend("force", opts, { desc = "[c]ode [t]erminal toggle" }))
-  end,
-
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter",
-    "echasnovski/mini.icons",
-    -- Ensure catppuccin is loaded for theme integration
-    "catppuccin/nvim",
+    { "<leader>ct", "<cmd>Lspsaga term_toggle<CR>", desc = "[c]ode [t]erminal toggle" },
   },
 }
