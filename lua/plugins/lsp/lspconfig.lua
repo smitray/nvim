@@ -1,5 +1,4 @@
 -- lua/plugins/lsp/lspconfig.lua
--- Main LSP setup that loads individual server configs
 
 return {
 	"neovim/nvim-lspconfig",
@@ -13,10 +12,12 @@ return {
 		local opts = require("core.lsp-opts")
 		local icons = require("core.icons")
 
-		-- Diagnostic setup
+		-- Diagnostic signs
 		for type, icon in pairs(icons.diagnostics) do
 			local hl = "DiagnosticSign" .. type
-			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+			if hl:match("^[%w_]+$") then
+				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+			end
 		end
 
 		vim.diagnostic.config({
@@ -27,24 +28,52 @@ return {
 			severity_sort = true,
 		})
 
-		-- Setup servers using individual configs
-		local mason_lspconfig = require("mason-lspconfig")
-		local installed_servers = mason_lspconfig.get_installed_servers()
+		local handlers = require("vim.lsp.handlers")
+		handlers["textDocument/hover"] = function(_, result, ctx, config)
+			config = vim.tbl_deep_extend("force", config or {}, { border = "rounded" })
+			return handlers.hover(_, result, ctx, config)
+		end
+		handlers["textDocument/signatureHelp"] = function(_, result, ctx, config)
+			config = vim.tbl_deep_extend("force", config or {}, { border = "rounded" })
+			return handlers.signature_help(_, result, ctx, config)
+		end
 
+		local mason_lspconfig = require("mason-lspconfig")
+		mason_lspconfig.setup({
+			ensure_installed = {
+				"lua_ls",
+				"vtsls",
+				"eslint",
+				"biome",
+				"html",
+				"cssls",
+				"jsonls",
+				"yamlls",
+				"bashls",
+				"marksman",
+				"svelte",
+				"vue_ls",
+				"astro",
+				"emmet_ls",
+				"taplo",
+				"pyright",
+				"ruff",
+			},
+			automatic_installation = true,
+		})
+
+		local installed_servers = mason_lspconfig.get_installed_servers()
 		for _, server in ipairs(installed_servers) do
-			local ok, server_config = pcall(require, "plugins.lsp.servers." .. server)
-			if ok then
-				local setup_config = vim.tbl_deep_extend("force", {
-					on_attach = opts.on_attach,
-					capabilities = opts.capabilities(),
-				}, server_config)
-				lspconfig[server].setup(setup_config)
+			local ok, server_opts = pcall(require, "plugins.lsp.servers." .. server)
+			local merged_opts = vim.tbl_deep_extend("force", {
+				on_attach = opts.on_attach,
+				capabilities = opts.capabilities,
+			}, ok and server_opts or {})
+
+			if lspconfig[server] and type(lspconfig[server].setup) == "function" then
+				lspconfig[server].setup(merged_opts)
 			else
-				-- Fallback for servers without custom config
-				lspconfig[server].setup({
-					on_attach = opts.on_attach,
-					capabilities = opts.capabilities(),
-				})
+				vim.notify("LSP server not supported by lspconfig: " .. server, vim.log.levels.WARN)
 			end
 		end
 	end,
