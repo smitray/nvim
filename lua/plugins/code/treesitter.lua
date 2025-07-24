@@ -67,58 +67,32 @@ return {
 			},
 		},
 	},
-	config = function(_, opts)
-		require("nvim-treesitter.configs").setup(opts)
+  config = function(_, opts)
+    require("nvim-treesitter.configs").setup(opts)
 
-		-- Auto-install missing parsers with notifications
-		local ts_install = require("nvim-treesitter.install")
-		local info = require("nvim-treesitter.info")
-		local missing_parsers = {}
+    -- Setup treesitter-context autocmd
+    vim.api.nvim_create_autocmd("BufEnter", {
+      group = vim.api.nvim_create_augroup("TSContextToggle", { clear = true }),
+      desc = "Enable/disable treesitter-context conditionally",
+      callback = function(args)
+        local buf = args.buf
+        local ft = vim.bo[buf].filetype
+        local excluded = {
+          "NvimTree", "neo-tree", "nvim-tree", "Telescope", "lazy", "mason", "help",
+          "markdown", "text", "txt", "man", "org", "norg", "terminal", "TelescopePrompt",
+          "toggleterm", "snack", "fugitive", "git", "gitcommit", "diff", "dashboard",
+          "alpha", "starter", "notify", "noice", "aerial", "quickfix", "prompt", "popup",
+          "spectre", "fzf", "yaml", "toml", "json", "jsonc",
+        }
 
-		-- Get installed parsers
-		local installed = info.installed_parsers()
-
-		for _, parser in ipairs(opts.ensure_installed) do
-			if not vim.tbl_contains(installed, parser) then
-				table.insert(missing_parsers, parser)
-			end
-		end
-
-		if #missing_parsers > 0 then
-			vim.notify("Installing missing parsers: " .. table.concat(missing_parsers, ", "), vim.log.levels.INFO)
-
-			-- Install parsers with notifications
-			vim.defer_fn(function()
-				for _, parser in ipairs(missing_parsers) do
-					ts_install.install(parser)
-					vim.notify("Installed parser: " .. parser, vim.log.levels.INFO)
-				end
-			end, 100)
-		end
-
-		-- Setup treesitter-context autocmd
-		vim.api.nvim_create_autocmd("BufEnter", {
-			group = vim.api.nvim_create_augroup("TSContextToggle", { clear = true }),
-			desc = "Enable/disable treesitter-context conditionally",
-			callback = function(args)
-				local buf = args.buf
-				local ft = vim.bo[buf].filetype
-				local excluded = {
-					"NvimTree", "neo-tree", "nvim-tree", "Telescope", "lazy", "mason", "help",
-					"markdown", "text", "txt", "man", "org", "norg", "terminal", "TelescopePrompt",
-					"toggleterm", "snack", "fugitive", "git", "gitcommit", "diff", "dashboard",
-					"alpha", "starter", "notify", "noice", "aerial", "quickfix", "prompt", "popup",
-					"spectre", "fzf", "yaml", "toml", "json", "jsonc",
-				}
-
-				if vim.tbl_contains(excluded, ft) or vim.api.nvim_buf_line_count(buf) < 30 then
-					pcall(function() require("treesitter-context").disable() end)
-				else
-					pcall(function() require("treesitter-context").enable() end)
-				end
-			end,
-		})
-	end,
+        if vim.tbl_contains(excluded, ft) or vim.api.nvim_buf_line_count(buf) < 30 then
+          pcall(function() require("treesitter-context").disable() end)
+        else
+          pcall(function() require("treesitter-context").enable() end)
+        end
+      end,
+    })
+  end,
 	opts = {
 		ensure_installed = {
 			"lua", "vim", "vimdoc", "query",
