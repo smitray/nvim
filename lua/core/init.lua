@@ -6,4 +6,5 @@ require("core.options")
 require("core.keymaps")
 require("core.autocmd")
 require("core.utils")
+require("core.lsp") -- Load the new LSP module
 require("core.lazy")
