@@ -16,7 +16,6 @@ vim.diagnostic.config({
     focusable = false,
     style = "minimal",
     border = "rounded",
-    source = "always",
     header = "",
     prefix = "",
   },
@@ -63,7 +62,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("gr", vim.lsp.buf.references, "Goto References")
     map("gs", vim.lsp.buf.signature_help, "Signature Help")
     map("<leader>v", "<cmd>vsplit | lua vim.lsp.buf.definition()<cr>", "Goto Definition in Vertical Split")
-    
+
     -- Diagnostic navigation
     map("gl", vim.diagnostic.open_float, "Open Diagnostic Float")
     map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
@@ -101,7 +100,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       map("<leader>Wl", function()
         vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders()), vim.log.levels.INFO, { title = "Workspace Folders" })
       end, "Workspace List Folders")
-      
+
       -- Visual mode keymaps
       map("<leader>lA", vim.lsp.buf.code_action, "Range Code Actions", "v")
       map("<leader>lF", function() vim.lsp.buf.format({ range = true }) end, "Format Range", "v")
@@ -114,11 +113,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
       if not blink_ok then
         -- Setup native completion only if blink.cmp is not available
         vim.opt_local.completeopt = { 'menu', 'menuone', 'noinsert', 'fuzzy', 'popup' }
-        
+
         -- Enable native LSP completion if available (Neovim 0.11+)
         if vim.lsp.completion and vim.lsp.completion.enable then
           vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
-          
+
           map('<C-Space>', function()
             vim.lsp.completion.trigger()
           end, "Trigger Completion", "i")
@@ -134,19 +133,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Document highlighting setup
     if client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, bufnr) then
       local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight-" .. bufnr, { clear = true })
-      
+
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
         buffer = bufnr,
         group = highlight_augroup,
         callback = vim.lsp.buf.document_highlight,
       })
-      
+
       vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
         buffer = bufnr,
         group = highlight_augroup,
         callback = vim.lsp.buf.clear_references,
       })
-      
+
       -- Critical: LspDetach cleanup to prevent memory leaks
       vim.api.nvim_create_autocmd("LspDetach", {
         buffer = bufnr,
