@@ -44,7 +44,6 @@ return {
     picker = {
       layout = {
         preset = "default",
-        preview = false,  -- disable preview split
       },
       sources = {
         explorer = {
@@ -54,13 +53,11 @@ return {
         command_history = {
           layout = {
             preset = "default",
-            preview = false,
           },
         },
         search_history = {
           layout = {
             preset = "default",
-            preview = false,
           },
         },
       },
