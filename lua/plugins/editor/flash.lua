@@ -123,10 +123,8 @@ return {
 			priority = 5000,
 		},
 
-		-- Action configuration
-		action = {
-			async = true,
-		},
+		-- Remove the problematic action configuration
+		-- The action field should contain function callbacks, not config options
 
 		-- Continue flash after first jump (useful for complex navigation)
 		continue = false,
