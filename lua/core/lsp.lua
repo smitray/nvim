@@ -1,14 +1,23 @@
 -- ~/.config/nvim/lua/core/lsp.lua
 -- Core LSP configuration for Neovim 0.11+
+local icons = require("core.icons")
 
 -- Configure diagnostics for a cleaner UI
 vim.diagnostic.config({
 	virtual_text = false, -- Disable virtual text diagnostics
 	virtual_lines = {
+		enabled = true,
 		-- Only show virtual line diagnostics for the current cursor line
-		current_line = true,
+		cursor_line_only = true,
 	},
-	signs = true,
+	signs = {
+		text = {
+			[vim.diagnostic.severity.ERROR] = icons.diagnostics.Error,
+			[vim.diagnostic.severity.WARN] = icons.diagnostics.Warning,
+			[vim.diagnostic.severity.HINT] = icons.diagnostics.Hint,
+			[vim.diagnostic.severity.INFO] = icons.diagnostics.Information,
+		},
+	},
 	underline = true,
 	update_in_insert = false,
 	severity_sort = true,
@@ -20,13 +29,6 @@ vim.diagnostic.config({
 		prefix = "",
 	},
 })
-
--- Define custom diagnostic signs using icons
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-for type, icon in pairs(signs) do
-	local hl = "DiagnosticSign" .. type
-	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
 
 -- Helper to check method support (compatible with both 0.10 and 0.11+)
 local function client_supports_method(client, method, bufnr)
@@ -65,8 +67,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		-- Diagnostic navigation
 		map("gl", vim.diagnostic.open_float, "Open Diagnostic Float")
-		map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
-		map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
+		map("[d", function()
+			require("trouble").previous({ skip_groups = true, jump = true })
+		end, "Previous Diagnostic")
+		map("]d", function()
+			require("trouble").next({ skip_groups = true, jump = true })
+		end, "Next Diagnostic")
 
 		-- Check if which-key is available for better keymap organization
 		local wk_ok, wk = pcall(require, "which-key")
@@ -99,14 +105,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
 				},
 				{
 					"<leader>lf",
-					vim.lsp.buf.format,
+					function()
+						vim.lsp.buf.format()
+					end,
 					desc = "Format",
 					buffer = bufnr,
 				},
 				{
 					"<leader>lF",
 					function()
-						vim.lsp.buf.format({ range = true })
+						vim.lsp.buf.format()
 					end,
 					desc = "Format Range",
 					buffer = bufnr,
@@ -142,7 +150,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			map("<leader>la", vim.lsp.buf.code_action, "Code Action")
 			map("<leader>ls", vim.lsp.buf.signature_help, "Display Signature Information")
 			map("<leader>lr", vim.lsp.buf.rename, "Rename all references")
-			map("<leader>lf", vim.lsp.buf.format, "Format")
+			map("<leader>lf", function()
+				vim.lsp.buf.format()
+			end, "Format")
 			map("<leader>Wa", vim.lsp.buf.add_workspace_folder, "Workspace Add Folder")
 			map("<leader>Wr", vim.lsp.buf.remove_workspace_folder, "Workspace Remove Folder")
 			map("<leader>Wl", function()
@@ -156,7 +166,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			-- Visual mode keymaps
 			map("<leader>lA", vim.lsp.buf.code_action, "Range Code Actions", "v")
 			map("<leader>lF", function()
-				vim.lsp.buf.format({ range = true })
+				vim.lsp.buf.format()
 			end, "Format Range", "v")
 		end
 
@@ -174,11 +184,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 					map("<C-Space>", function()
 						vim.lsp.completion.trigger()
-					end, "Trigger Completion", "i")
-				else
-					-- Fallback for older versions
-					map("<C-Space>", function()
-						vim.fn.complete(vim.fn.col("."), vim.lsp.omnifunc(0, ""))
 					end, "Trigger Completion", "i")
 				end
 			end
@@ -228,3 +233,4 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- Enable only Lua LSP for now
 vim.lsp.enable({ "lua_ls" })
+
