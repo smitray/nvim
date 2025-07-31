@@ -14,4 +14,6 @@ return {
 
   { import = "plugins.code" },
 
+  { import = "plugins.git" },
+
 }
