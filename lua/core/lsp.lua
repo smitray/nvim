@@ -104,23 +104,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
           buffer = bufnr,
         },
         {
-          "<leader>lf",
-          function()
-            vim.lsp.buf.format()
-          end,
-          desc = "Format",
-          buffer = bufnr,
-        },
-        {
-          "<leader>lF",
-          function()
-            vim.lsp.buf.format()
-          end,
-          desc = "Format Range",
-          buffer = bufnr,
-          mode = "v",
-        },
-        {
           "<leader>Wa",
           vim.lsp.buf.add_workspace_folder,
           desc = "Workspace Add Folder",
@@ -150,9 +133,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
       map("<leader>la", vim.lsp.buf.code_action, "Code Action")
       map("<leader>ls", vim.lsp.buf.signature_help, "Display Signature Information")
       map("<leader>lr", vim.lsp.buf.rename, "Rename all references")
-      map("<leader>lf", function()
-        vim.lsp.buf.format()
-      end, "Format")
       map("<leader>Wa", vim.lsp.buf.add_workspace_folder, "Workspace Add Folder")
       map("<leader>Wr", vim.lsp.buf.remove_workspace_folder, "Workspace Remove Folder")
       map("<leader>Wl", function()
@@ -165,9 +145,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
       -- Visual mode keymaps
       map("<leader>lA", vim.lsp.buf.code_action, "Range Code Actions", "v")
-      map("<leader>lF", function()
-        vim.lsp.buf.format()
-      end, "Format Range", "v")
     end
 
     -- Native completion setup for Neovim 0.11+ (only if blink.cmp is not available)
